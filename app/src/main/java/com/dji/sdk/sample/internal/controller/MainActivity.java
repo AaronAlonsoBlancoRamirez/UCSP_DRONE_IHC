@@ -28,12 +28,24 @@ import com.dji.sdk.sample.internal.model.ViewWrapper;
 import com.dji.sdk.sample.internal.utils.ToastUtils;
 import com.dji.sdk.sample.internal.view.DemoListView;
 import com.dji.sdk.sample.internal.view.PresentableView;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.otto.Subscribe;
 
 import java.util.Stack;
 
 import dji.sdk.base.BaseProduct;
 import dji.sdk.sdkmanager.DJISDKManager;
+
+import android.text.TextUtils;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+import android.util.Log;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,15 +62,41 @@ public class MainActivity extends AppCompatActivity {
     private MenuItem searchViewItem;
     private MenuItem hintItem;
 
+    private DatabaseReference firebaseRef;
+
     //region Life-cycle
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         DJISampleApplication.getEventBus().register(this);
         setContentView(R.layout.activity_main);
         setupActionBar();
         contentFrameLayout = (FrameLayout) findViewById(R.id.framelayout_content);
         initParams();
+
+        FirebaseApp.initializeApp(this);
+        firebaseRef = FirebaseDatabase.getInstance().getReference("0001");
+        firebaseRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // Verifica si los datos existen
+                if (dataSnapshot.exists()) {
+                    Long xValue = dataSnapshot.child("x").getValue(Long.class);
+                    Long yValue = dataSnapshot.child("y").getValue(Long.class);
+                    Long zValue = dataSnapshot.child("z").getValue(Long.class);
+                    Toast.makeText(getApplicationContext(), zValue.toString(), Toast.LENGTH_SHORT).show();
+                    // Actualiza el TextView con los valores
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("FirebaseData", "Error al obtener datos de Firebase: " + databaseError.getMessage());
+            }
+        });
+
     }
 
     @Override

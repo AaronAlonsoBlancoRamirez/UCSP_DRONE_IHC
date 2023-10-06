@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.gms.google-services'
 
 repositories {
     mavenLocal()
@@ -9,7 +10,6 @@ repositories {
 
 android {
     compileSdkVersion 31
-    buildToolsVersion '23.0.1'
     useLibrary 'org.apache.http.legacy'
 
     defaultConfig {
@@ -87,6 +87,7 @@ dependencies {
         exclude module: 'library-anti-distortion'
         //exclude module: 'fly-safe-database'
     })
+    implementation 'com.google.firebase:firebase-database-ktx:20.2.2'
     compileOnly 'com.dji:dji-sdk-provided:4.16.4'
 
     implementation 'androidx.appcompat:appcompat:1.0.0'
