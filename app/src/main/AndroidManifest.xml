@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.dji.sdk.sample">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- SDK permission requirement -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -33,7 +32,6 @@
         android:label="SDK-DJI"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:extractNativeLibs="true"
         tools:replace="label"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
 
