@@ -55,7 +55,7 @@ Reemplaza "YOUR_API_KEY_HERE" con tu clave API personal.
 3. Ejecuta la aplicación en un emulador o dispositivo Android.
    
 ## NOTAS
-No se recomienda actualizar la versión de Gradle a 8.0 debido a problemas conocidos. Mantén la versión que se especifica en el archivo build.gradle.
+No se recomienda actualizar la versión de Gradle a 8.0 debido a problemas aún desconocidos. Mantén la versión que se especifica en el archivo build.gradle.
 
 ## Contacto
 Yerson Sanchez Y. (Head del proyecto)
