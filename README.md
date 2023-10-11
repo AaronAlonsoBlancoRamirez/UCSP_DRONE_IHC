@@ -48,11 +48,12 @@ Asegúrate de tener los siguientes requisitos instalados:
 Reemplaza "YOUR_API_KEY_HERE" con tu clave API personal.
 
 ## Instrucciones de Ejecución
-1. **Clona este repositorio en tu entorno de desarrollo.
+1. Clona este repositorio en tu entorno de desarrollo.
 
-2. **Abre el proyecto en Android Studio.
+2. Abre el proyecto en Android Studio.
 
-3. **Ejecuta la aplicación en un emulador o dispositivo Android.
+3. Ejecuta la aplicación en un emulador o dispositivo Android.
+   
 ## NOTAS
 No se recomienda actualizar la versión de Gradle a 8.0 debido a problemas conocidos. Mantén la versión que se especifica en el archivo build.gradle.
 
