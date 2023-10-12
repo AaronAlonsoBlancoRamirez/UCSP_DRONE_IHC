@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private MenuItem hintItem;
 
     private DatabaseReference firebaseRef;
-/* 
+
     //region Life-cycle
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,34 +71,16 @@ public class MainActivity extends AppCompatActivity {
 
 
         DJISampleApplication.getEventBus().register(this);
+
         setContentView(R.layout.activity_main);
         setupActionBar();
         contentFrameLayout = (FrameLayout) findViewById(R.id.framelayout_content);
         initParams();
 
-        FirebaseApp.initializeApp(this);
-        firebaseRef = FirebaseDatabase.getInstance().getReference("0001");
-        firebaseRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                // Verifica si los datos existen
-                if (dataSnapshot.exists()) {
-                    Long xValue = dataSnapshot.child("x").getValue(Long.class);
-                    Long yValue = dataSnapshot.child("y").getValue(Long.class);
-                    Long zValue = dataSnapshot.child("z").getValue(Long.class);
-                    Toast.makeText(getApplicationContext(), zValue.toString(), Toast.LENGTH_SHORT).show();
-                    // Actualiza el TextView con los valores
-                }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e("FirebaseData", "Error al obtener datos de Firebase: " + databaseError.getMessage());
-            }
-        });
 
     }
-*/
+
     @Override
     protected void onDestroy() {
         DJISampleApplication.getEventBus().unregister(this);

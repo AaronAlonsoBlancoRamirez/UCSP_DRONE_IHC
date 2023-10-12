@@ -2,12 +2,14 @@ package com.dji.sdk.sample.demo.flightcontroller;
 
 import android.app.Service;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
@@ -20,6 +22,12 @@ import com.dji.sdk.sample.internal.utils.ModuleVerificationUtil;
 import com.dji.sdk.sample.internal.utils.OnScreenJoystick;
 import com.dji.sdk.sample.internal.utils.ToastUtils;
 import com.dji.sdk.sample.internal.view.PresentableView;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -39,6 +47,11 @@ import dji.keysdk.KeyManager;
 import dji.sdk.flightcontroller.FlightController;
 import dji.sdk.flightcontroller.Simulator;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
 /**
  * Class for virtual stick.
@@ -69,6 +82,8 @@ public class VirtualStickView extends RelativeLayout implements View.OnClickList
     private FlightController flightController = null;
     private Simulator simulator = null;
 
+    private DatabaseReference firebaseRef;
+
     public VirtualStickView(Context context) {
         super(context);
         init(context);
@@ -85,75 +100,6 @@ public class VirtualStickView extends RelativeLayout implements View.OnClickList
         super.onAttachedToWindow();
         setUpListeners();
     }
-
-/* 
-    @Override
-protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-
-    // Resto del código de inicialización de la actividad
-    DJISampleApplication.getEventBus().register(this);
-    setContentView(R.layout.activity_main);
-    setupActionBar();
-    contentFrameLayout = (FrameLayout) findViewById(R.id.framelayout_content);
-    initParams();
-
-    // Inicializa Firebase
-    FirebaseApp.initializeApp(this);
-
-    // Obtiene la referencia a la ubicación "0001" en la base de datos de Firebase
-    firebaseRef = FirebaseDatabase.getInstance().getReference("0001");
-
-    // Registra el Value Event Listener para escuchar los cambios en la ubicación "0001"
-    firebaseRef.addValueEventListener(new ValueEventListener() {
-        @Override
-        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-            // Verifica si los datos existen
-            if (dataSnapshot.exists()) {
-                // Obtén el valor de "z"
-                Long zValue = dataSnapshot.child("z").getValue(Long.class);
-
-                // Verifica si "z" está en el rango deseado para despegar
-                if (zValue != null && zValue > 0 && zValue < 5) {
-                    // Activa el botón de despegue
-                    btnTakeOff.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            btnTakeOff.setEnabled(true);  // Habilita el botón de despegue
-                        }
-                    });
-
-                    // Configura el clic del botón de despegue para iniciar el despegue
-                    btnTakeOff.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            // Inicia el despegue
-                            flightController.startTakeoff(new CommonCallbacks.CompletionCallback() {
-                                @Override
-                                public void onResult(DJIError djiError) {
-                                    // Maneja el resultado del despegue
-                                    if (djiError != null) {
-                                        Log.e("FlightController", "Error al despegar: " + djiError.getDescription());
-                                    } else {
-                                        Log.i("FlightController", "Despegue iniciado correctamente.");
-                                    }
-                                }
-                            });
-                        }
-                    });
-                }
-            }
-        }
-
-        @Override
-        public void onCancelled(@NonNull DatabaseError databaseError) {
-            Log.e("FirebaseData", "Error al obtener datos de Firebase: " + databaseError.getMessage());
-        }
-    });
-}*/
-
-
-
 
     @Override
     protected void onDetachedFromWindow() {
@@ -176,6 +122,68 @@ protected void onCreate(Bundle savedInstanceState) {
         layoutInflater.inflate(R.layout.view_virtual_stick, this, true);
         initParams();
         initUI();
+
+        FirebaseApp.initializeApp(getContext());
+        firebaseRef = FirebaseDatabase.getInstance().getReference("0001");
+        firebaseRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // Verifica si los datos existen
+                if (dataSnapshot.exists()) {
+                    Long xValue = dataSnapshot.child("x").getValue(Long.class);
+                    Long yValue = dataSnapshot.child("y").getValue(Long.class);
+                    Long zValue = dataSnapshot.child("z").getValue(Long.class);
+                    Toast.makeText(getContext(), zValue.toString(), Toast.LENGTH_SHORT).show();
+                    if(zValue.toString().equals("1")){
+                        textView.setVisibility(VISIBLE);
+                        simulator.start(InitializationData.createInstance(new LocationCoordinate2D(23, 113), 10, 10), new CommonCallbacks.CompletionCallback() {
+                            @Override
+                            public void onResult(DJIError djiError) {
+                                if (djiError != null) {
+                                    ToastUtils.setResultToToast(djiError.getDescription());
+                                }
+                            }
+                        });
+                        flightController.startTakeoff(new CommonCallbacks.CompletionCallback() {
+                            @Override
+                            public void onResult(DJIError djiError) {
+                                DialogUtils.showDialogBasedOnError(getContext(), djiError);
+                            }
+                        });
+                    }else{
+                        textView.setVisibility(INVISIBLE);
+                        flightController.startLanding(new CommonCallbacks.CompletionCallback() {
+                            @Override
+                            public void onResult(DJIError djiError) {
+                                if (djiError == null) {
+                                    // Aterrizaje iniciado con éxito
+                                    Toast.makeText(getContext(), "Aterrizaje iniciado", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    // Maneja el error
+                                    Toast.makeText(getContext(), "Error al iniciar el aterrizaje: " + djiError.getDescription(), Toast.LENGTH_SHORT).show();
+                                    DialogUtils.showDialogBasedOnError(getContext(), djiError);
+                                }
+                            }
+                        });
+                        simulator.stop(new CommonCallbacks.CompletionCallback() {
+                            @Override
+                            public void onResult(DJIError djiError) {
+                                if (djiError != null) {
+                                    ToastUtils.setResultToToast(djiError.getDescription());
+                                }
+                            }
+                        });
+                    }
+
+                    // Actualiza el TextView con los valores
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("FirebaseData", "Error al obtener datos de Firebase: " + databaseError.getMessage());
+            }
+        });
     }
 
     private void initParams() {
