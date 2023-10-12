@@ -59,7 +59,7 @@ No se recomienda actualizar la versión de Gradle a 8.0 debido a problemas aún 
 
 ## Contacto
 Yerson Sanchez Y. (Head del proyecto)
-Carlos Morales U.
-Cristhian Ocola P.
+//Carlos Morales U.
+//Cristhian Ocola P.
 
 Este `README.md` proporciona información sobre el proyecto, requisitos, instrucciones de ejecución y contacto para posibles consultas. Asegúrate de personalizarlo según las necesidades específicas de tu proyecto.
